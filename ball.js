@@ -38,22 +38,28 @@ class ball{
         stroke(colour);
         circle(this.x,this.y,this.size);
 
-        let randomNums = ['0.98', '1.02'];
+        //let randomNums = ['0.98', '1.02'];
         if(this.active == 1){
             if(this.y + (this.size / 2) > 400 || this.y - (this.size / 2) < 0 ){
                 this.ySpeed *= -1;
-                this.ySpeed *= random(randomNums);
-                console.log("Y " +this.ySpeed);
+                //this.ySpeed *= random(randomNums);
+                //console.log("Y " +this.ySpeed);
+                if(this.ySpeed > 30){
+                    this.ySpeed = 30
+                }
+                if(this.ySpeed < -30){
+                    this.ySpeed = -30
+                }
             }
         
-        if(this.ySpeed >= 8 && this.ySpeed > 0){
-            this.ySpeed = 6;
-            console.log("set yspeed to 6");
-        }
-        if(this.ySpeed <= 4 && this.ySpeed > 0){
-            this.ySpeed = 6;
-            console.log("set yspeed to 6");
-        }
+        //if(this.ySpeed >= 8 && this.ySpeed > 0){
+        //    this.ySpeed = 6;
+        //    console.log("set yspeed to 6");
+        //}
+        //if(this.ySpeed <= 4 && this.ySpeed > 0){
+        //    this.ySpeed = 6;
+        //    console.log("set yspeed to 6");
+        //}
             
         }
     }

@@ -10,19 +10,22 @@ let offScreen = 10000;
 let ball1 = new ball
 let ballInPlay = false;
 let p1 ={
-    x: 10,
+    x: 15,
     y: canvas.height/2,
     width: 10,
     height: 75,
     points: 0
 };
 let p2 ={
-    x: canvas.width-10,
+    x: canvas.width-15,
     y: canvas.height/2,
     width: 10,
     height: 75,
     points: 0
 };
+let win = false;
+let timer0 = 5;
+let timer1 = 5;
 
 //-----------------------------------------------------------------
 
@@ -116,7 +119,7 @@ function draw(){
     //Multiplayer
         rectMode(CORNER);
         strokeWeight(3)
-        textFont("Arial");
+        textFont("century gothic");
         if(vars.multiplayer == true){
             noStroke()
             fill(255,255,255);
@@ -182,7 +185,7 @@ function draw(){
         }
         
     //PLAYERS
-        rectMode(CENTER)
+        rectMode(CENTER);
         fill(255,255,255);
         stroke(255,255,255);
         rect(p1.x, p1.y, p1.width, p1.height);
@@ -214,10 +217,10 @@ function draw(){
         }
     //SINGLEPLAYER
         if(vars.multiplayer == false && vars.mouseControl == false){
-            if(keyIsDown(UP_ARROW)){
+            if(keyIsDown(UP_ARROW) && p1.y > 0 + p1.height/2){
                 p1.y -= 5
             }
-            if(keyIsDown(DOWN_ARROW)){
+            if(keyIsDown(DOWN_ARROW) && p1.y < canvas.height - p1.height/2){
                 p1.y += 5
             }
         }
@@ -256,10 +259,27 @@ function draw(){
         stroke(255,255,255);
         fill(255,255,255)
         strokeWeight(2);
-        line(canvas.width/2, 0, canvas.width/2, canvas.height);
         line(0,1,canvas.width,1);
         line(0,canvas.height-1,canvas.width,canvas.height-1);
+        if(win == false){
+            line(canvas.width/2, 0, canvas.width/2, canvas.height);
+        }
     }
+    //BALL TIMER
+    if(frameCount % 30 == 0 && timer0 > 0 && gameStarted == true && win == false){
+        timer0 --;
+    }
+    
+    if(timer0 > 0 && gameStarted == true && win == false){
+        text(timer0,  canvas.width / 2 - 50, canvas.height / 2);
+        text(timer0,  canvas.width / 2 + 50, canvas.height / 2);
+    }
+    if(timer0 == 0 && gameStarted == true && win == false){
+        ball1.flash = false;
+        ball1.active = true;
+        ball1.ySpeed = 6;
+    }
+
     //BALL COLLISION
 
     //ceiling collision
@@ -273,12 +293,55 @@ function draw(){
     }
     
     //player collision
-    if(ball1.x - (ball1.size / 2) < p1.x && ball1.y < p1.y + (p1.height/2) && ball1.y > p1.y - (p1.height/2)){
+    if(ball1.x - (ball1.size) < p1.x && ball1.y < p1.y + (p1.height/2) && ball1.y > p1.y - (p1.height/2)){
+        ball1.xSpeed -= 0.5
         ball1.xSpeed *= -1
+        ball1.ySpeed = (((p1.y - ball1.y) / 8) * -1);
+
     }
-    if(ball1.x + (ball1.size / 2) > p2.x && ball1.y < p2.y + (p2.height/2) && ball1.y > p2.y - (p2.height/2)){
+    if(ball1.x + (ball1.size) > p2.x && ball1.y < p2.y + (p2.height/2) && ball1.y > p2.y - (p2.height/2)){
+        ball1.xSpeed += 0.5
         ball1.xSpeed *= -1
+        ball1.ySpeed = (((p2.y - ball1.y) / 8) * -1);
     }
+
+//Win condition
+
+    
+    if(win == true){
+        fill(255,255,255);
+        textSize(50)
+        
+        if( frameCount % 30 == 0 && timer1 > 0){
+            timer1 --;
+        }
+
+        text(timer1,  canvas.width / 2, canvas.height / 2 + 50);
+    }
+    if(p1.points == vars.pts){ 
+        text(('Player 1 wins!'), canvas.width / 2, canvas.height / 2);
+    }
+    if(p2.points == vars.pts){
+        text(('Player 2 wins!'), canvas.width / 2, canvas.height / 2);
+    }
+
+    
+    if(timer1 == 0){
+    menu2 = false;
+    m2Button.enabled = true;
+    vars.multiplayer = false;
+    vars.pts = 4;
+    vars.difficulty = 2;
+    vars.mouseControl = false;
+    ballCount = 1;
+    gameStarted = 0;
+    p1.points = 0;
+    p2.points = 0;
+
+    win = false;
+    timer1 = 5;
+    }
+    
 }
 
 
@@ -286,7 +349,10 @@ function draw(){
 
 
 function mousePressed(){
-console.log(mouseY);
+//console.log(mouseY);
+
+//console.log(p1.y - mouseY);
+
 //Main Menu Button
     if(mouseX < m2Button.x+m2Button.width && mouseX > m2Button.x && mouseY < m2Button.y+m2Button.height && mouseY > m2Button.y && m2Button.enabled == true){
         ball1 = new ball(canvas.width/2,canvas.height/2,30,6,6,1, false, 0);
@@ -334,6 +400,8 @@ console.log(mouseY);
         if(mouseX < startButton.x+startButton.width/2 && mouseX > startButton.x-startButton.width/2 && mouseY < startButton.y+startButton.height/2 && mouseY >startButton.y-startButton.height/2){
             gameStarted = true;
             menu2 = false;
+            ballInPlay = true;
+            ball1.active = 0;
             console.log("Game Started");
         }
 
@@ -347,14 +415,6 @@ console.log(mouseY);
 
 
 function keyPressed(){
-    if(keyCode === 13 && gameStarted == true){ // enter
-        if(ballInPlay == false){
-            ballInPlay = true;
-        }
-        ball1.flash = false;
-        ball1.active = true;
-        ball1.acceleration = 0;
-    }
     if(keyCode === 27){ // esc
         menu2 = false;
         m2Button.enabled = true;
@@ -368,6 +428,9 @@ function keyPressed(){
         gameStarted = 0;
         p1.points = 0;
         p2.points = 0;
+
+        timer0 = 5;
+        timet1 = 5;
     }
 
     if(gameStarted == true){
@@ -385,44 +448,54 @@ function keyPressed(){
 
 
 function Point(side){
-    if(vars.mouseControl == false){
-        p1.y = canvas.height / 2
-    }
-    ball1.Yspeed = 6
-    console.log(ballCount);
-    if(ballCount < 2){
-        ball1.xSpeed = 6
-    }
-    if(ballCount > 2){
-        ball1.xSpeed = -6
-    }
-    ballCount++
-    if(ballCount == 4){
-        ballCount = 0;
-    }
-    
-
-    console.log(ballCount);
-    p2.y = canvas.height / 2
-
-    ball1.x = canvas.width/2
-    ball1.y = canvas.height/2
-    ball1.flash = false;
-    ball1.active = false;
-
-    if(side == 0){
-        p2.points += 1;
-    }else if(side == 1){
-        p1.points += 1;
-    }
-    if(p1.points == vars.pts){
+        if(vars.mouseControl == false){
+            p1.y = canvas.height / 2
+        }
+        ball1.Yspeed = 6
+        console.log(ballCount);
+        if(ballCount < 2){
+            ball1.xSpeed = 6
+        }
+        if(ballCount > 2){
+            ball1.xSpeed = -6
+        }
+        ballCount++
+        if(ballCount == 4){
+            ballCount = 0;
+        }
         
+        
+        console.log(ballCount);
+        p2.y = canvas.height / 2
+        
+        ball1.x = canvas.width/2
+        ball1.y = canvas.height/2
+        ball1.flash = false;
+        ball1.active = false;
+
+        timer0 = 5;
+        
+        if(side == 0){
+            p2.points += 1;
+        }else if(side == 1){
+            p1.points += 1;
+        }
+    if(p1.points == vars.pts){
+        winGame();
+        console.log("p1 wins!");
+        win = true;
     }
     if(p2.points == vars.pts){
-
+        winGame();
+        console.log("p2 wins!");
+        win = true;
     }
 }
 
+function winGame(){
+    ballInPlay = false
+    ball1.active = false
+}
 //0 = left, 1 = right
 
 
