@@ -1,46 +1,46 @@
-let colour = [];
+let colour = [255,255,255];
 class ball{
-    constructor(x, y, size, xSpeed, Yspeed, active, flash){
+    constructor(x, y, size, xSpeed, Yspeed, active, colour){
         this.x = x;
         this.y = y;
         this.size = size;
         this.xSpeed = xSpeed;
         this.ySpeed = Yspeed;
         this.active = active;
-        this.flash = flash;
+        this.colour = colour;
         //, acceleration
         //this.acceleration = acceleration;
     }
     draw(){
-        let a = 1
-        if(this.flash == true){
+        // let a = 1
+        // if(this.flash == true){
 
-            if(frameCount % 30 == 0){
-                console.log("a second has passed");
-                if(a == 1){
-                    a = 0;
-                    console.log("a = 1");
-                }else
-                if(a == 0){
-                    a = 1;
-                    console.log("a = 0");
-                }
-            }
+        //     if(frameCount % 30 == 0){
+        //         console.log("a second has passed");
+        //         if(a == 1){
+        //             a = 0;
+        //             console.log("a = 1");
+        //         }else
+        //         if(a == 0){
+        //             a = 1;
+        //             console.log("a = 0");
+        //         }
+        //     }
             
-        }
-        if(a == 1){
-            colour = [255,255,255];
-        }
-        if(a==0){
-            colour = [0,0,0];
-        }
+        // }
+        // if(a == 1){
+        //     colour = [255,255,255];
+        // }
+        // if(a==0){
+        //     colour = [0,0,0];
+        // }
 
         fill(colour);
         stroke(colour);
         circle(this.x,this.y,this.size);
 
         //let randomNums = ['0.98', '1.02'];
-        if(this.active == 1){
+        if(this.active == true){
             if(this.y + (this.size / 2) > 400 || this.y - (this.size / 2) < 0 ){
                 this.ySpeed *= -1;
             //multiply the ySpeed by 0.98 or 1.02
