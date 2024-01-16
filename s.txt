@@ -1,0 +1,20 @@
+A pong style game in p5js with multiple modes and difficulties
+
+features:
+
+singleplayer mode
+difficulty selection
+optional bonus modes 
+-powerups for either player to obtain
+-gain points by hitting objectives rather than hitting wall
+set amount of points to win
+
+
+multiplayer mode
+
+
+
+ySpeed will depend on where the ball hits the line
+
+ai:
+if ball y is above p2 y move p2 y up and vice versa
