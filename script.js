@@ -4,10 +4,11 @@ let canvas = {
 };
 
 //game
-let ballCount = 1;
-let gameStart = false;
+let ballCount = 1; 
+let gameStart = false; // is true when the game interface is enabled
 let ball1 = new ball //(canvas.width/2,canvas.height/2,30,6,6,1, false, 0);
-let ballInPlay = false;
+let ballInPlay = false; // when true, ball.draw and ball.update become active.
+let ballFlashing = false;
 let p1 ={
     x: 15,
     y: canvas.height/2,
@@ -22,18 +23,18 @@ let p2 ={
     height: 75,
     points: 0
 };
-let gameOver = false;
-let ballTimer = 5; // ball timer
-let timer1 = 5; // reset timer
 let ai = {
-    speed: {1:3,2:8,3:10}
-}
+    speed: {1:3,2:7,3:10}
+};
+let ballTimer = 5; // ball timer
+let gameEndTimer = 15; // reset timer
+let gameEndTimerEnabled = false; // is true when gameEndTimer is active;
 
 //-----------------------------------------------------------------
 
-//menus
+//MENUS
     //main menu
-let img1;
+let PONG;
 let menu1 = {
     x: (canvas.width / 2),
     y: (canvas.height/ 4 * 3),
@@ -44,11 +45,11 @@ let menu1 = {
     //menu 2
 let menu2 = false;
 let btnC = {
-    b1 : {x:100, y:25},
-    b2 : {x:100, y:100},
-    b3 : {x:100, y:175},
-    b4 : {x:100, y:250},
-    bQ : {x:canvas.width/5 * 4, y:canvas.height / 5},
+    b1 : {x:canvas.width / 8, y:canvas.height / 16},
+    b2 : {x:canvas.width / 8, y:canvas.height / 16 * 4},
+    b3 : {x:canvas.width / 8, y:canvas.height / 16 * 7},
+    b4 : {x:canvas.width / 8, y:canvas.height / 16 * 10},
+    bQ : {x:canvas.width/10 * 8.5,y:canvas.height/16},
     height:50,
     width:50
 };
@@ -70,7 +71,7 @@ let menuQ = false;
 function setup(){
     createCanvas(canvas.width, canvas.height);
     frameRate(30);
-    img1 = loadImage('./images/PONG.png');
+    PONG = loadImage('./images/PONG.png');
     //INPUT
     // let inpX = 50
     // let inpY = 50
@@ -96,7 +97,7 @@ function draw(){
         //image
         imageMode(CENTER);
         noSmooth();
-        image(img1, canvas.width/2, 175, 400, 200);
+        image(PONG, canvas.width/2, 175, 400, 200);
     }
 
     //Menu 2 
@@ -150,7 +151,8 @@ function draw(){
             text('x', btnC.b4.x + 13, btnC.b4.y + 38);
         };
     //QMenu
-        text('?', btnC.bQ.x, btnC.bQ.y);
+        textSize(40);
+        text('?', btnC.bQ.x + 13, btnC.bQ.y + 38);
 
 //Outside Text
 
@@ -173,28 +175,38 @@ function draw(){
     //start button
         textSize(40);
         textAlign(CENTER);
-        fill(20,20,20)
+        fill(20,20,20);
         text('Start', startButton.x, startButton.y + 10);
 
         textAlign(LEFT);
-    };
+    }
 
-    //Menu ?
+    //Menu Q
     if(menuQ == true){
-        text('Controls', 0, 0);
-    };
-
-
-    //-----------------------------------------------------------------------------------------------------------------------------
-    //-----------------------------------------------------------------------------------------------------------------------------
-
+        fill(255,255,255);
+        noStroke();
+        textSize(16);
+        text('Controls', canvas.width / 18, 20);
+        text('General', canvas.width / 12, 40);
+        text(' - Esc: Press to go back to the main menu at any time', canvas.width / 9, 60);
+        text('SinglePlayer', canvas.width / 12, 80);
+        text(' - Keyboard controls', canvas.width / 9, 100);
+        text(' - Up and down arrows: press to move players paddle', canvas.width / 6, 120);
+        text(' - Mouse Controls', canvas.width / 9, 140);
+        text(' - Move mouse up and down to control players paddle', canvas.width / 6, 160);
+        text('Multiplayer', canvas.width / 12, 200);
+        text(' - Player 1', canvas.width / 9, 220);
+        text(' - W and S keys to control player 1`s paddle', canvas.width / 6, 240);
+        text(' - Player 2', canvas.width / 9, 260);
+        text(' - Up and down arrow keys to control player 2`s paddle', canvas.width / 6, 280);
+    }
 
     //GAME
     if(gameStart == true){
         if(ballInPlay==true){
             ball1.draw();
             ball1.update();
-        };
+        }
     //PLAYERS
         rectMode(CENTER);
         fill(255,255,255);
@@ -204,29 +216,29 @@ function draw(){
     //POINTS
         textSize(40);
         textAlign(CENTER);
-        text(p1.points, canvas.width / 2 - 40, 50)
-        text(p2.points, canvas.width / 2 + 40, 50)
+        text(p1.points, canvas.width / 2 - 40, 50);
+        text(p2.points, canvas.width / 2 + 40, 50);
 //CONTROLS
     //MULTIPLAYER
         if(vars.multiplayer == true){
             //Player 1
-            if(keyIsDown(87)){ // w
+            if(keyIsDown(87) && p1.y > p1.height/2){ // w
                 p1.y -= 10
             }
-            if(keyIsDown(83)){ // s
+            if(keyIsDown(83) && p1.y < canvas.height - p1.height/2){ // s
                 p1.y += 10
             }
             //Player 2
-            if(keyIsDown(UP_ARROW)){ // up arrow
+            if(keyIsDown(UP_ARROW) && p2.y > p2.height/2){ // up arrow
                 p2.y -= 10
             }
-            if(keyIsDown(DOWN_ARROW)){ // down arrow
+            if(keyIsDown(DOWN_ARROW) && p2.y < canvas.height - p2.height/2){ // down arrow
                 p2.y += 10;
             }
         }
     //SINGLEPLAYER
         if(vars.multiplayer == false && vars.mouseControl == false){
-            if(keyIsDown(UP_ARROW) && p1.y > 0 + p1.height/2){
+            if(keyIsDown(UP_ARROW) && p1.y > p1.height/2){
                 p1.y -= 5
             }
             if(keyIsDown(DOWN_ARROW) && p1.y < canvas.height - p1.height/2){
@@ -234,8 +246,8 @@ function draw(){
             }
         }
     //SINGLEPLAYER "AI"
-        if(vars.multiplayer == false && ball1.active == true && ball1.x > canvas.width / 2){
-            if(p2.y > ball1.y){
+        if(vars.multiplayer == false && ball1.active == true){
+            if(p2.y > ball1.y && ball1.x > canvas.width / 2 && p2.y > p2.height/2){
                 if(vars.difficulty == 1){
                     p2.y -= ai.speed[1];
                 }
@@ -246,7 +258,7 @@ function draw(){
                     p2.y -= ai.speed[3];
                 }
             }
-            if(p2.y < ball1.y){
+            if(p2.y < ball1.y && ball1.x > canvas.width / 2  && p2.y < canvas.height - p2.height/2){
                 if(vars.difficulty == 1){
                     p2.y += ai.speed[1];
                 }
@@ -254,6 +266,13 @@ function draw(){
                     p2.y += ai.speed[2];
                 }
                 if(vars.difficulty == 3){
+                    p2.y += ai.speed[3];
+                }
+            }
+            if(vars.difficulty == 3 && ball1.x < canvas.width / 2){
+                if(p2.y > canvas.height / 2){
+                    p2.y -= ai.speed[3];
+                }else if(p2.y < canvas.height / 2){
                     p2.y += ai.speed[3];
                 }
             }
@@ -270,32 +289,26 @@ function draw(){
         strokeWeight(2);
         line(0,1,canvas.width,1);
         line(0,canvas.height-1,canvas.width,canvas.height-1);
-        if(gameOver == false){
+        if(gameEndTimerEnabled == false){
             line(canvas.width/2, 0, canvas.width/2, canvas.height);
         }
     }
     //BALL TIMER
-    if(frameCount % 30 == 0 && ballTimer > 0 && gameStart == true && gameOver == false){
+    if(frameCount % 30 == 0 && ballTimer > 0 && gameStart == true && gameEndTimerEnabled == false){
         ballTimer --;
     }
     
-    if(ballTimer > 0 && gameStart == true && gameOver == false){
+    if(ballTimer > 0 && gameStart == true && gameEndTimerEnabled == false){
         text(ballTimer,  canvas.width / 2 - 50, canvas.height / 2 + 10);
         text(ballTimer,  canvas.width / 2 + 50, canvas.height / 2 + 10);
         ball1.active = false;
         ball1.x = canvas.width / 2
         ball1.y = canvas.height / 2
     }
-    if(ballTimer == 0 && gameStart == true && gameOver == false){
+    if(ballTimer == 0 && gameStart == true && gameEndTimerEnabled == false){
         ball1.active = true;
         gameStart = true;
         ballInPlay = true;
-        if(ballCount == 1 || ballCount == 2){
-            //ball1.xSpeed = 6;
-        };
-        if(ballCount == 3 || ballCount == 4){
-            //ball1.xSpeed = -6;
-        };
     }
 
 //BALL COLLISION
@@ -308,44 +321,39 @@ function draw(){
         Point(0);
         console.log("point 0");
     }
-    
     //player collision
-    if(ball1.x - (ball1.size) < p1.x && ball1.y < p1.y + (p1.height/2) && ball1.y > p1.y - (p1.height/2)){
-        ball1.xSpeed -= 0.5
-        ball1.xSpeed *= -1
-        ball1.ySpeed = (((p1.y - ball1.y) / 8) * -1);
+    if(ball1.x - (ball1.size) < p1.x && ball1.y - (ball1.size/2) < p1.y + (p1.height/2) && ball1.y + (ball1.size/2)  > p1.y - (p1.height/2)){
+        ball1.xSpeed -= 0.5;
+        ball1.xSpeed *= -1;
+        ball1.ySpeed = (((p1.y - ball1.y) / 6) * -1);
     }
     if(ball1.x + (ball1.size) > p2.x && ball1.y < p2.y + (p2.height/2) && ball1.y > p2.y - (p2.height/2)){
-        ball1.xSpeed += 0.5
-        ball1.xSpeed *= -1
-        ball1.ySpeed = (((p2.y - ball1.y) / 8) * -1);
+        ball1.xSpeed += 0.5;
+        ball1.xSpeed *= -1;
+        ball1.ySpeed = (((p2.y - ball1.y) / 6) * -1);
     }
-//Win condition
-    if(gameOver == true){
+//Game Reset Timer
+    if(gameEndTimerEnabled == true){
         fill(255,255,255);
-        textSize(50);
-        
-        if( frameCount % 30 == 0 && timer1 > 0){
-            timer1 --;
+        textSize(40);
+        if( frameCount % 30 == 0 && gameEndTimer > 0){
+            gameEndTimer --;
         }
-
-        text(timer1,  canvas.width / 2, canvas.height / 2 + 50);
+        text(gameEndTimer,  canvas.width / 2, canvas.height / 2 + 50);
     }
+    //Win Condition
     if(p1.points == vars.pts){ 
         text(('Player 1 wins!'), canvas.width / 2, canvas.height / 2);
     }
     if(p2.points == vars.pts){
         text(('Player 2 wins!'), canvas.width / 2, canvas.height / 2);
     }
-
-    if(timer1 == 0){
+    if(gameEndTimer == 0){
     fullReset();
     }
-    
 }
 
 function mousePressed(){
-    
     //Menu 2 Buttons
     if(menu2==true){
         //Multiplayer
@@ -375,26 +383,26 @@ function mousePressed(){
                 if(vars.mouseControl == true){vars.mouseControl = false;}else if(vars.mouseControl == false){vars.mouseControl = true;};
             }
         }
+        //Q Menu
+        if(mouseX < btnC.bQ.x+btnC.width && mouseX > btnC.bQ.x && mouseY < btnC.bQ.y+btnC.height && mouseY >btnC.bQ.y){
+            menuQ = true;
+            menu2 = false;
+        }
         //Game Start
         if(mouseX < startButton.x+startButton.width/2 && mouseX > startButton.x-startButton.width/2 && mouseY < startButton.y+startButton.height/2 && mouseY >startButton.y-startButton.height/2){
+            ball1 = new ball(canvas.width/2,canvas.height/2,20,6,6,1, false, 0);
             gameStart = true;
             ball1.active = false;
             menu2 = false;
             ballInPlay = true;
             console.log("Game Started");
         }
-        //Q Menu
-        if(mouseX < btnC.bQ.x+btnC.width && mouseX > btnC.bQ.x && mouseY < btnC.bQ.y+btnC.height && mouseY >btnC.bQ.y){
-            menuQ = true;
-            menu2 = false;
-        }
     }
-    //Main Menu Button
+    //Options Menu Button
         if(mouseX < menu1.x+menu1.width / 2&& mouseX > menu1.x-menu1.width / 2&& mouseY < menu1.y+menu1.height && mouseY > menu1.y && menu1.enabled == true){
-            ball1 = new ball(canvas.width/2,canvas.height/2,20,6,6,1, false, 0);
             console.log("Menu 2 initiated");
-            menu1.enabled = false;
             menu2 = true;
+            menu1.enabled = false;
             inpX = 100;
             inpY = 250;
         }
@@ -402,11 +410,15 @@ function mousePressed(){
 }
 
 function keyPressed(){
+    console.log(keyCode);
     if(keyCode === 27){ // esc
         fullReset();
     }
+    if(keyCode === 13 && menu1.enabled == true){ // enter
+        
+    }
     if(keyCode === LEFT_ARROW){
-        console.log("gameOver " + gameOver, "gameStart " + gameStart, "ballInPlay " + ballInPlay, "ball1.active " + ball1.active, "ball1.xSpeed" + ball1.xSpeed);
+        console.log("gameOver " + gameEndTimerEnabled, "gameStart " + gameStart, "ballInPlay " + ballInPlay, "ball1.active " + ball1.active, "ball1.xSpeed" + ball1.xSpeed);
     }
     // if(gameStart == true){
     //     if(keyCode === 70){ // f
@@ -431,6 +443,7 @@ function Point(side){
     ball1.x = canvas.width/2
     ball1.y = canvas.height/2
     ball1.ySpeed = 6;
+    ball1.xSpeed = 6;
 
     if(side == 0){
         p2.points += 1;
@@ -438,11 +451,16 @@ function Point(side){
         p1.points += 1;
     }
     console.log("ball count " + ballCount);
+    if(ballCount == 1 || ballCount == 2){
+        //ball1.xSpeed = 6;
+    };
+    if(ballCount == 3 || ballCount == 4){
+        //ball1.xSpeed = -6;
+    };
     ballCount++
     if(ballCount == 5){
         ballCount = 1;
-    };
-
+    };    
     if(p1.points == vars.pts){
         endGame();
         console.log("p1 wins!");
@@ -459,7 +477,7 @@ function endGame(){
     ball1.xSpeed = 0;
     ball1.ySpeed = 0;
     //ball1.flash = false;
-    gameOver = true;
+    gameEndTimerEnabled = true;
 }
 //0 = left, 1 = right
 
@@ -482,7 +500,7 @@ function fullReset(){
     ballInPlay = false
     ballCount = 1;
     ballTimer = 5;
-    timer1 = 5;
+    gameEndTimer = 15;
 
     //ball1 vars
     ball1.xSpeed = 6;
@@ -492,18 +510,18 @@ function fullReset(){
 
     //game vars
     gameStart = false;
-    gameOver = false;
+    gameEndTimerEnabled = false;
     p1.points = 0;
-    p1.y = canvas.width / 2
+    p1.y = canvas.height / 2;
     p2.points = 0;
-    p2.y = canvas.width / 2
-
+    p2.y = canvas.height / 2;
 }
 
 //to do
-//q menu
-//fix ball timer not stopping ball
-//clean up code
+//fix ball not moving to left on turn 3 and 4
+//add ceiling collision to 2 player mode and ai
+//add text to main menu button
+//add play again and main menu buttons to win screen
 
 
 
