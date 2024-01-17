@@ -1,6 +1,6 @@
 let colour = [255,255,255];
 class ball{
-    constructor(x, y, size, xSpeed, Yspeed, active, colour){
+    constructor(x, y, size, xSpeed, Yspeed, active, colour, flash){
         this.x = x;
         this.y = y;
         this.size = size;
@@ -8,32 +8,28 @@ class ball{
         this.ySpeed = Yspeed;
         this.active = active;
         this.colour = colour;
+        this.flash = false;
         //, acceleration
         //this.acceleration = acceleration;
     }
     draw(){
-        // let a = 1
-        // if(this.flash == true){
-
-        //     if(frameCount % 30 == 0){
-        //         console.log("a second has passed");
-        //         if(a == 1){
-        //             a = 0;
-        //             console.log("a = 1");
-        //         }else
-        //         if(a == 0){
-        //             a = 1;
-        //             console.log("a = 0");
-        //         }
-        //     }
-            
-        // }
-        // if(a == 1){
-        //     colour = [255,255,255];
-        // }
-        // if(a==0){
-        //     colour = [0,0,0];
-        // }
+        let a;
+        if(this.flash == true){
+            if(frameCount % 30 == 0){
+                console.log("a second has passed");
+                a=1;
+            }
+            if(frameCount % 15 == 0 && frameCount % 30 !== 0){
+                console.log("a changed");
+                a = 0;
+            }
+        }
+        if(a == 1){
+            colour = [255,255,255];
+        }
+        if(a==0){
+            colour = [0,0,0];
+        }
 
         fill(colour);
         stroke(colour);

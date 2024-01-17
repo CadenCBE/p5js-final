@@ -8,7 +8,6 @@ let ballCount = 1;
 let gameStart = false; // is true when the game interface is enabled
 let ball1 = new ball //(canvas.width/2,canvas.height/2,30,6,6,1, false, 0);
 let ballInPlay = false; // when true, ball.draw and ball.update become active.
-let ballFlashing = false;
 let p1 ={
     x: 15,
     y: canvas.height/2,
@@ -26,7 +25,7 @@ let p2 ={
 let ai = {
     speed: {1:3,2:7,3:10}
 };
-let ballTimer = 5; // ball timer
+let ballTimer = 6; // ball timer
 let gameEndTimer = 15; // reset timer
 let gameEndTimerEnabled = false; // is true when gameEndTimer is active;
 
@@ -65,8 +64,9 @@ let startButton = {
     width: 300,
     height: 60
 };
-    //q menu
-let menuQ = false;
+    //information menu
+    //also refered to as q menu or menuQ
+let iMenu = false;
 
 function setup(){
     createCanvas(canvas.width, canvas.height);
@@ -182,7 +182,7 @@ function draw(){
     }
 
     //Menu Q
-    if(menuQ == true){
+    if(iMenu == true){
         fill(255,255,255);
         noStroke();
         textSize(16);
@@ -295,18 +295,23 @@ function draw(){
     }
     //BALL TIMER
     if(frameCount % 30 == 0 && ballTimer > 0 && gameStart == true && gameEndTimerEnabled == false){
+        ball1.flash = true;
         ballTimer --;
     }
     
     if(ballTimer > 0 && gameStart == true && gameEndTimerEnabled == false){
-        text(ballTimer,  canvas.width / 2 - 50, canvas.height / 2 + 10);
-        text(ballTimer,  canvas.width / 2 + 50, canvas.height / 2 + 10);
+        if(ballTimer !== 6){
+            text(ballTimer,  canvas.width / 2 - 50, canvas.height / 2 + 10);
+            text(ballTimer,  canvas.width / 2 + 50, canvas.height / 2 + 10);
+            ball1.colour = [0,0,0]
+        }
         ball1.active = false;
-        ball1.x = canvas.width / 2
-        ball1.y = canvas.height / 2
+        ball1.x = canvas.width / 2;
+        ball1.y = canvas.height / 2;
     }
     if(ballTimer == 0 && gameStart == true && gameEndTimerEnabled == false){
         ball1.active = true;
+        ball1.flash = false;
         gameStart = true;
         ballInPlay = true;
     }
@@ -385,7 +390,7 @@ function mousePressed(){
         }
         //Q Menu
         if(mouseX < btnC.bQ.x+btnC.width && mouseX > btnC.bQ.x && mouseY < btnC.bQ.y+btnC.height && mouseY >btnC.bQ.y){
-            menuQ = true;
+            iMenu = true;
             menu2 = false;
         }
         //Game Start
@@ -420,30 +425,33 @@ function keyPressed(){
     if(keyCode === LEFT_ARROW){
         console.log("gameOver " + gameEndTimerEnabled, "gameStart " + gameStart, "ballInPlay " + ballInPlay, "ball1.active " + ball1.active, "ball1.xSpeed" + ball1.xSpeed);
     }
-    // if(gameStart == true){
-    //     if(keyCode === 70){ // f
-    //         if(ball1.flash == false){
-    //             ball1.flash = true
-    //             console.log("flash true");
-    //         }else if(ball1.flash == true){
-    //             ball1.flash = false
-    //             console.log("flash false");
-    //         }
-    //     }
-    // }
+    if(gameStart == true){
+        if(keyCode === 70){ // f
+            if(ball1.flash == false){
+                ball1.flash = true
+                console.log("flash true");
+            }else if(ball1.flash == true){
+                ball1.flash = false
+                console.log("flash false");
+            }
+        }
+    }
 }
+
+//Functions
 
 function Point(side){
     if(vars.mouseControl == false){
         p1.y = canvas.height / 2
     };
     p2.y = canvas.height / 2
-    ballTimer = 5;
+    ballTimer = 6;
     
-    ball1.x = canvas.width/2
-    ball1.y = canvas.height/2
+    ball1.x = canvas.width/2;
+    ball1.y = canvas.height/2;
     ball1.ySpeed = 6;
-    ball1.xSpeed = 6;
+    //ball1.xSpeed = 6;
+    ball1.flash = true;
 
     if(side == 0){
         p2.points += 1;
@@ -476,7 +484,7 @@ function endGame(){
     ball1.active = false
     ball1.xSpeed = 0;
     ball1.ySpeed = 0;
-    //ball1.flash = false;
+    ball1.flash = false;
     gameEndTimerEnabled = true;
 }
 //0 = left, 1 = right
@@ -492,25 +500,25 @@ function fullReset(){
     //menu vars
     menu2 = false;
     menu1.enabled = true;
-    menuQ = false;
+    iMenu = false;
     vars.multiplayer = false;
     vars.pts = 4;
     vars.difficulty = 2;
     vars.mouseControl = false;
     ballInPlay = false
     ballCount = 1;
-    ballTimer = 5;
+    ballTimer = 6;
     gameEndTimer = 15;
 
     //ball1 vars
     ball1.xSpeed = 6;
     ball1.ySpeed = 6;
     ball1.active = false;
-    //ball1.flash = false;
 
     //game vars
     gameStart = false;
     gameEndTimerEnabled = false;
+    ball1.flash = false;
     p1.points = 0;
     p1.y = canvas.height / 2;
     p2.points = 0;
@@ -523,13 +531,4 @@ function fullReset(){
 //add text to main menu button
 //add play again and main menu buttons to win screen
 
-
-
-
-
-
-
-
-
-
-//https://d2l.cbe.ab.ca/d2l/lms/survey/user/surveys_list.d2l?ou=1153585
+//submit Project module debreif
