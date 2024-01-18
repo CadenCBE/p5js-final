@@ -29,6 +29,15 @@ let ballTimer = 6; // ball timer
 let gameEndTimer = 15; // reset timer
 let gameEndTimerEnabled = false; // is true when gameEndTimer is active;
 
+let replayButton = {
+    active: false,
+    x:canvas.width / 2,
+    y:canvas.height * 0.8,
+    width: canvas.width / 3,
+    height: canvas.height / 6,
+    text: 'Play Again?'
+}
+
 //-----------------------------------------------------------------
 
 //MENUS
@@ -218,6 +227,20 @@ function draw(){
         textAlign(CENTER);
         text(p1.points, canvas.width / 2 - 40, 50);
         text(p2.points, canvas.width / 2 + 40, 50);
+    //PLAY AGAIN BUTTON
+        if(replayButton.active == true){
+            fill(0,0,0);
+            stroke(255,255,255);
+            strokeWeight(5)
+            rectMode(CENTER);
+            rect(replayButton.x, replayButton.y, replayButton.width, replayButton.height, 15);
+
+            noStroke();
+            fill(255,255,255);
+            textSize(25);
+            textAlign(CENTER);
+            text(replayButton.text, replayButton.x, replayButton.y + 7);
+        }
 //CONTROLS
     //MULTIPLAYER
         if(vars.multiplayer == true){
@@ -303,7 +326,10 @@ function draw(){
         if(ballTimer !== 6){
             text(ballTimer,  canvas.width / 2 - 50, canvas.height / 2 + 10);
             text(ballTimer,  canvas.width / 2 + 50, canvas.height / 2 + 10);
-            ball1.colour = [0,0,0]
+            
+        }
+        if(ballTimer == 6){
+            ball1.colour = [0,0,0];
         }
         ball1.active = false;
         ball1.x = canvas.width / 2;
@@ -337,6 +363,15 @@ function draw(){
         ball1.xSpeed *= -1;
         ball1.ySpeed = (((p2.y - ball1.y) / 6) * -1);
     }
+
+//y collision
+
+    //if(ball1.y - (ball1.size) < p1.y 
+    //&& ball1.x - (ball1.size/2) < p1.x + (p1.width/2) 
+    //&& ball1.x + (ball1.size/2) > p1.x - (p1.width/2)){
+    //    ball1.ySpeed *= -1;
+    //    console.log("tried collision");
+    //}
 //Game Reset Timer
     if(gameEndTimerEnabled == true){
         fill(255,255,255);
@@ -403,23 +438,27 @@ function mousePressed(){
             console.log("Game Started");
         }
     }
-    //Options Menu Button
-        if(mouseX < menu1.x+menu1.width / 2&& mouseX > menu1.x-menu1.width / 2&& mouseY < menu1.y+menu1.height && mouseY > menu1.y && menu1.enabled == true){
-            console.log("Menu 2 initiated");
-            menu2 = true;
-            menu1.enabled = false;
-            inpX = 100;
-            inpY = 250;
+    //play again button
+        if(replayButton.active == true && mouseX < replayButton.x+replayButton.width/2 && mouseX > replayButton.x-replayButton.width/2 && mouseY < replayButton.x+replayButton.height/2 && mouseY > replayButton.y-replayButton.height/2){
+            gameReset();
         }
-    //-------------------------------------------------------------------------------------------------------
+    //Options Menu Button
+    if(mouseX < menu1.x+menu1.width / 2&& mouseX > menu1.x-menu1.width / 2&& mouseY < menu1.y+menu1.height && mouseY > menu1.y && menu1.enabled == true){
+        console.log("Menu 2 initiated");
+        menu2 = true;
+        menu1.enabled = false;
+        inpX = 100;
+        inpY = 250;
+    }
 }
-
+    //-------------------------------------------------------------------------------------------------------
+    
 function keyPressed(){
-    console.log(keyCode);
+    //console.log(keyCode);
     if(keyCode === 27){ // esc
         fullReset();
     }
-    if(keyCode === 13 && menu1.enabled == true){ // enter
+    if(keyCode === 13){ // enter
         
     }
     if(keyCode === LEFT_ARROW){
@@ -450,7 +489,6 @@ function Point(side){
     ball1.x = canvas.width/2;
     ball1.y = canvas.height/2;
     ball1.ySpeed = 6;
-    //ball1.xSpeed = 6;
     ball1.flash = true;
 
     if(side == 0){
@@ -486,17 +524,33 @@ function endGame(){
     ball1.ySpeed = 0;
     ball1.flash = false;
     gameEndTimerEnabled = true;
+    replayButton.active = true;
+};
+
+function gameReset(){
+    p1.points = 0;
+    p2.points = 0;
+    gameStart = true;
+    ballInPlay = true;
+    ballCount = 1;
+    gameEndTimerEnabled = false;
+    gameEndTimer = 15;
+    ball1.active = true;
+    ball1.xSpeed = 6;
+    ball1.ySpeed = 6;
+    ball1.colour = [255,255,255];
+    replayButton.active = false;
 }
 //0 = left, 1 = right
 
 
 // function returnBall(){
-//     ball1.x = canvas.width / 2;
-//     ball1.y = canvas.height / 2;
-//     ball1.ySpeed = 6
-// }
-
-function fullReset(){
+    //     ball1.x = canvas.width / 2;
+    //     ball1.y = canvas.height / 2;
+    //     ball1.ySpeed = 6
+    // }
+    
+    function fullReset(){
     //menu vars
     menu2 = false;
     menu1.enabled = true;
@@ -523,12 +577,14 @@ function fullReset(){
     p1.y = canvas.height / 2;
     p2.points = 0;
     p2.y = canvas.height / 2;
+
+    replayButton.active = false;
 }
 
 //to do
-//fix ball not moving to left on turn 3 and 4
-//add ceiling collision to 2 player mode and ai
+//add y collision to paddles
 //add text to main menu button
-//add play again and main menu buttons to win screen
+//add play again button to win screen
+//make player 1 and player 2 collision the same
 
 //submit Project module debreif

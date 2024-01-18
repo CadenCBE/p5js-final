@@ -16,23 +16,23 @@ class ball{
         let a;
         if(this.flash == true){
             if(frameCount % 30 == 0){
-                console.log("a second has passed");
                 a=1;
             }
             if(frameCount % 15 == 0 && frameCount % 30 !== 0){
-                console.log("a changed");
                 a = 0;
             }
         }
         if(a == 1){
-            colour = [255,255,255];
+            this.colour = [255,255,255];
         }
         if(a==0){
-            colour = [0,0,0];
+            this.colour = [0,0,0];
         }
-
-        fill(colour);
-        stroke(colour);
+        if(this.flash == false){
+            this.colour = [255,255,255];
+        }
+        fill(this.colour);
+        stroke(this.colour);
         circle(this.x,this.y,this.size);
 
         //let randomNums = ['0.98', '1.02'];
