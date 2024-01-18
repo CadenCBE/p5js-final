@@ -458,14 +458,14 @@ function Point(side){
     }else if(side == 1){
         p1.points += 1;
     }
+    ballCount++
     console.log("ball count " + ballCount);
     if(ballCount == 1 || ballCount == 2){
-        //ball1.xSpeed = 6;
+        ball1.xSpeed = 6;
     };
     if(ballCount == 3 || ballCount == 4){
-        //ball1.xSpeed = -6;
+        ball1.xSpeed = -6;
     };
-    ballCount++
     if(ballCount == 5){
         ballCount = 1;
     };    
